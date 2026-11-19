@@ -17,6 +17,8 @@ import {
   COURSES,
   Course,
   CourseCategory,
+  DurationFilter,
+  PriceRangeFilter,
   SkillsFutureScheme,
   TrainingMode,
 } from './data/courses';
@@ -41,6 +43,9 @@ export default function App() {
     []
   );
   const [selectedModes, setSelectedModes] = useState<TrainingMode[]>([]);
+  const [durationFilter, setDurationFilter] = useState<DurationFilter>('all');
+  const [priceRangeFilter, setPriceRangeFilter] =
+    useState<PriceRangeFilter>('all');
   const [maxNettFee, setMaxNettFee] = useState<number>(3000);
   const [onlyWithStartDate, setOnlyWithStartDate] = useState<boolean>(false);
   const [showingSavedOnly, setShowingSavedOnly] = useState<boolean>(false);
@@ -130,10 +135,26 @@ export default function App() {
     setSelectedProviders([]);
     setSelectedSchemes([]);
     setSelectedModes([]);
+    setDurationFilter('all');
+    setPriceRangeFilter('all');
     setMaxNettFee(3000);
     setOnlyWithStartDate(false);
     setShowingSavedOnly(false);
     setSortBy('best_match');
+  };
+
+  const handlePriceRangeChange = (range: PriceRangeFilter) => {
+    setPriceRangeFilter(range);
+    if (range !== 'all') {
+      setMaxNettFee(3000);
+    }
+  };
+
+  const handleMaxNettFeeChange = (val: number) => {
+    setMaxNettFee(val);
+    if (val < 3000) {
+      setPriceRangeFilter('all');
+    }
   };
 
   const handleSelectTrack = (category: CourseCategory, query?: string) => {
@@ -184,12 +205,44 @@ export default function App() {
         return false;
       }
 
+      if (durationFilter === 'short' && course.durationHours > 16) {
+        return false;
+      }
+      if (
+        durationFilter === 'medium' &&
+        (course.durationHours <= 16 || course.durationHours > 40)
+      ) {
+        return false;
+      }
+      if (durationFilter === 'long' && course.durationHours <= 40) {
+        return false;
+      }
+
       const breakdown = calculateFeeBreakdown(
         course,
         eligibilityTier,
         availableCredit,
         applyCreditInPreview
       );
+
+      if (priceRangeFilter === 'under_200' && breakdown.finalPayable >= 200) {
+        return false;
+      }
+      if (
+        priceRangeFilter === '200_500' &&
+        (breakdown.finalPayable < 200 || breakdown.finalPayable > 500)
+      ) {
+        return false;
+      }
+      if (
+        priceRangeFilter === '500_1000' &&
+        (breakdown.finalPayable <= 500 || breakdown.finalPayable > 1000)
+      ) {
+        return false;
+      }
+      if (priceRangeFilter === 'above_1000' && breakdown.finalPayable <= 1000) {
+        return false;
+      }
 
       if (maxNettFee < 3000 && breakdown.finalPayable > maxNettFee) {
         return false;
@@ -255,6 +308,8 @@ export default function App() {
     selectedSchemes,
     selectedModes,
     onlyWithStartDate,
+    durationFilter,
+    priceRangeFilter,
     eligibilityTier,
     availableCredit,
     applyCreditInPreview,
@@ -283,6 +338,12 @@ export default function App() {
           onSearchSubmit={() => scrollToSection('directory')}
           activeQuickScope={activeQuickScope}
           onQuickScopeChange={handleQuickScopeChange}
+          durationFilter={durationFilter}
+          onDurationChange={setDurationFilter}
+          priceRangeFilter={priceRangeFilter}
+          onPriceRangeChange={handlePriceRangeChange}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
         />
 
         <FeaturedTracksSection onSelectTrack={handleSelectTrack} />
@@ -299,7 +360,7 @@ export default function App() {
           selectedModes={selectedModes}
           onToggleMode={handleToggleMode}
           maxNettFee={maxNettFee}
-          onMaxNettFeeChange={setMaxNettFee}
+          onMaxNettFeeChange={handleMaxNettFeeChange}
           onlyWithStartDate={onlyWithStartDate}
           onToggleStartDate={() => setOnlyWithStartDate((prev) => !prev)}
           showingSavedOnly={showingSavedOnly}
@@ -317,6 +378,10 @@ export default function App() {
           onToggleApplyCredit={() => setApplyCreditInPreview((prev) => !prev)}
           searchQuery={searchQuery}
           onClearSearch={() => setSearchQuery('')}
+          durationFilter={durationFilter}
+          onDurationChange={setDurationFilter}
+          priceRangeFilter={priceRangeFilter}
+          onPriceRangeChange={handlePriceRangeChange}
         />
 
         <FundingGuideSection

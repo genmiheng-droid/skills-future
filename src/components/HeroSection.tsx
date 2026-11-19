@@ -1,5 +1,21 @@
-import { Search, ArrowRight, GraduationCap } from 'lucide-react';
+import {
+  Search,
+  ArrowRight,
+  GraduationCap,
+  ChevronDown,
+  Clock,
+  DollarSign,
+  Layers,
+} from 'lucide-react';
 import { FormEvent, useState } from 'react';
+import {
+  CATEGORIES,
+  CourseCategory,
+  DURATION_OPTIONS,
+  DurationFilter,
+  PRICE_RANGE_OPTIONS,
+  PriceRangeFilter,
+} from '../data/courses';
 
 interface HeroSectionProps {
   searchQuery: string;
@@ -7,6 +23,12 @@ interface HeroSectionProps {
   onSearchSubmit: () => void;
   activeQuickScope: 'all' | 'credit' | 'mid_career';
   onQuickScopeChange: (scope: 'all' | 'credit' | 'mid_career') => void;
+  durationFilter: DurationFilter;
+  onDurationChange: (duration: DurationFilter) => void;
+  priceRangeFilter: PriceRangeFilter;
+  onPriceRangeChange: (range: PriceRangeFilter) => void;
+  selectedCategory: CourseCategory | 'All';
+  onCategoryChange: (category: CourseCategory | 'All') => void;
 }
 
 const POPULAR_TERMS = [
@@ -24,6 +46,12 @@ export function HeroSection({
   onSearchSubmit,
   activeQuickScope,
   onQuickScopeChange,
+  durationFilter,
+  onDurationChange,
+  priceRangeFilter,
+  onPriceRangeChange,
+  selectedCategory,
+  onCategoryChange,
 }: HeroSectionProps) {
   const [imgError, setImgError] = useState(false);
 
@@ -92,29 +120,122 @@ export function HeroSection({
               </button>
             </div>
 
-            {/* Signature MySkillsFuture Search Bar */}
+            {/* Signature MySkillsFuture Expanded Search Bar */}
             <form
               onSubmit={handleSubmit}
-              className="flex flex-col sm:flex-row gap-2.5 mb-5"
+              className="bg-[#F8FAFC] border border-slate-200 rounded-lg p-3 sm:p-3.5 mb-5 space-y-3"
             >
-              <div className="relative flex-1">
-                <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  placeholder="What do you want to learn? (e.g. Python, Food Safety, AI)"
-                  aria-label="What do you want to learn?"
-                  className="w-full h-12 pl-11 pr-4 text-sm sm:text-base bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20"
-                />
+              {/* Primary Keyword Row */}
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <div className="relative flex-1">
+                  <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                    placeholder="What do you want to learn? (e.g. Python, Food Safety, AI)"
+                    aria-label="What do you want to learn?"
+                    className="w-full h-11 pl-11 pr-4 text-sm sm:text-base bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="h-11 px-5 bg-[#C8102E] hover:bg-[#A60D25] text-white text-sm font-semibold rounded-md inline-flex items-center justify-center gap-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <span>Search Courses</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                type="submit"
-                className="h-12 px-6 bg-[#C8102E] hover:bg-[#A60D25] text-white text-sm font-semibold rounded-md inline-flex items-center justify-center gap-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <span>Search Courses</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+
+              {/* 3 Filter Dropdown Bars: Duration, Price Range, Subject Area */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 border-t border-slate-200/80">
+                {/* 1. Course Duration */}
+                <div>
+                  <label
+                    htmlFor="hero-duration-select"
+                    className="block text-[11px] font-semibold text-slate-600 mb-1"
+                  >
+                    Course Duration
+                  </label>
+                  <div className="relative">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      id="hero-duration-select"
+                      value={durationFilter}
+                      onChange={(e) =>
+                        onDurationChange(e.target.value as DurationFilter)
+                      }
+                      className="w-full h-9 pl-8 pr-7 text-xs font-medium bg-white border border-slate-300 rounded-md text-slate-800 appearance-none focus:outline-none focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 cursor-pointer truncate"
+                    >
+                      {DURATION_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* 2. Price Range */}
+                <div>
+                  <label
+                    htmlFor="hero-price-select"
+                    className="block text-[11px] font-semibold text-slate-600 mb-1"
+                  >
+                    Price Range
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      id="hero-price-select"
+                      value={priceRangeFilter}
+                      onChange={(e) =>
+                        onPriceRangeChange(e.target.value as PriceRangeFilter)
+                      }
+                      className="w-full h-9 pl-8 pr-7 text-xs font-medium bg-white border border-slate-300 rounded-md text-slate-800 appearance-none focus:outline-none focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 cursor-pointer truncate"
+                    >
+                      {PRICE_RANGE_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* 3. Subject Area */}
+                <div>
+                  <label
+                    htmlFor="hero-subject-select"
+                    className="block text-[11px] font-semibold text-slate-600 mb-1"
+                  >
+                    Subject Area
+                  </label>
+                  <div className="relative">
+                    <Layers className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      id="hero-subject-select"
+                      value={selectedCategory}
+                      onChange={(e) =>
+                        onCategoryChange(
+                          e.target.value as CourseCategory | 'All'
+                        )
+                      }
+                      className="w-full h-9 pl-8 pr-7 text-xs font-medium bg-white border border-slate-300 rounded-md text-slate-800 appearance-none focus:outline-none focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 cursor-pointer truncate"
+                    >
+                      <option value="All">All subject areas</option>
+                      {CATEGORIES.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
             </form>
 
             {/* Popular Searches (clean unboxed text buttons) */}

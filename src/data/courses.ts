@@ -103,6 +103,31 @@ export const CATEGORIES: CourseCategory[] = [
   'Training & Adult Ed',
 ];
 
+export type DurationFilter = 'all' | 'short' | 'medium' | 'long';
+
+export const DURATION_OPTIONS: { value: DurationFilter; label: string }[] = [
+  { value: 'all', label: 'Any duration' },
+  { value: 'short', label: 'Short (1–2 days / ≤ 16 hrs)' },
+  { value: 'medium', label: 'Medium (3–5 days / 17–40 hrs)' },
+  { value: 'long', label: 'Extended (> 40 hrs / Diploma)' },
+];
+
+export type PriceRangeFilter =
+  | 'all'
+  | 'under_200'
+  | '200_500'
+  | '500_1000'
+  | 'above_1000';
+
+export const PRICE_RANGE_OPTIONS: { value: PriceRangeFilter; label: string }[] =
+  [
+    { value: 'all', label: 'Any price range' },
+    { value: 'under_200', label: 'Under S$200 (Est. nett)' },
+    { value: '200_500', label: 'S$200 – S$500 (Est. nett)' },
+    { value: '500_1000', label: 'S$500 – S$1,000 (Est. nett)' },
+    { value: 'above_1000', label: 'Above S$1,000 (Est. nett)' },
+  ];
+
 export const PROVIDERS: string[] = [
   'NUS-ISS',
   'NTU PaCE',

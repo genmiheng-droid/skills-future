@@ -11,6 +11,10 @@ import {
   CATEGORIES,
   Course,
   CourseCategory,
+  DURATION_OPTIONS,
+  DurationFilter,
+  PRICE_RANGE_OPTIONS,
+  PriceRangeFilter,
   PROVIDERS,
   SCHEMES,
   SkillsFutureScheme,
@@ -61,6 +65,10 @@ interface CourseDirectoryProps {
   onToggleApplyCredit: () => void;
   searchQuery: string;
   onClearSearch: () => void;
+  durationFilter: DurationFilter;
+  onDurationChange: (duration: DurationFilter) => void;
+  priceRangeFilter: PriceRangeFilter;
+  onPriceRangeChange: (range: PriceRangeFilter) => void;
 }
 
 export function CourseDirectory({
@@ -93,6 +101,10 @@ export function CourseDirectory({
   onToggleApplyCredit,
   searchQuery,
   onClearSearch,
+  durationFilter,
+  onDurationChange,
+  priceRangeFilter,
+  onPriceRangeChange,
 }: CourseDirectoryProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -103,6 +115,8 @@ export function CourseDirectory({
     selectedSchemes.length > 0 ||
     selectedModes.length > 0 ||
     maxNettFee < 3000 ||
+    durationFilter !== 'all' ||
+    priceRangeFilter !== 'all' ||
     onlyWithStartDate ||
     showingSavedOnly ||
     searchQuery.trim().length > 0;
@@ -184,6 +198,28 @@ export function CourseDirectory({
             </label>
           ))}
         </div>
+      </div>
+
+      {/* Course Duration */}
+      <div className="pb-5 border-b border-slate-200">
+        <label
+          htmlFor="sidebar-duration-select"
+          className="block text-xs font-semibold text-slate-900 mb-2"
+        >
+          Course Duration
+        </label>
+        <select
+          id="sidebar-duration-select"
+          value={durationFilter}
+          onChange={(e) => onDurationChange(e.target.value as DurationFilter)}
+          className="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#C8102E]"
+        >
+          {DURATION_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Max Nett Fee Slider */}
@@ -368,6 +404,41 @@ export function CourseDirectory({
                     className="inline-flex items-center gap-1 text-xs font-medium text-[#C8102E] hover:underline cursor-pointer"
                   >
                     <span>Query: “{searchQuery}”</span>
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {durationFilter !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => onDurationChange('all')}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[#C8102E] hover:underline cursor-pointer"
+                  >
+                    <span>
+                      Duration:{' '}
+                      {
+                        DURATION_OPTIONS.find((d) => d.value === durationFilter)
+                          ?.label
+                      }
+                    </span>
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {priceRangeFilter !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => onPriceRangeChange('all')}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[#C8102E] hover:underline cursor-pointer"
+                  >
+                    <span>
+                      Price:{' '}
+                      {
+                        PRICE_RANGE_OPTIONS.find(
+                          (p) => p.value === priceRangeFilter
+                        )?.label
+                      }
+                    </span>
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
